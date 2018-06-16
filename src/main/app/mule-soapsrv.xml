@@ -1,7 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.9.0"
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></mule>
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" basePath="/soapsrv" doc:name="HTTP Listener Configuration"/>
+    <cxf:configuration name="CXF_Configuration" enableMuleSoapHeaders="true" initializeStaticBusInstance="true" doc:name="CXF Configuration"/>
+    
+    <flow name="mainFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/" doc:name="HTTP"/>
+        <cxf:jaxws-service configuration-ref="CXF_Configuration" serviceClass="nl.idemi.mulesoft.ISoapWebService" doc:name="CXF"  />
+        <component class="nl.idemi.mulesoft.SoapWebService" doc:name="Java"/>
+    </flow>
+    <sub-flow name="serviceMethodA">
+        <logger message="SubFlow serviceMethodA is called." level="INFO" doc:name="Logger"/>
+        <set-payload value="#[&quot;The payload from serviceMethodA = \&quot;&quot; + payload + &quot;\&quot;&quot;]" doc:name="Set Payload"/>
+    </sub-flow>
+    <flow name="serviceMethodAFlow">
+        <logger message="Flow serviceMethodA is called." level="INFO" doc:name="Logger"/>
+        <set-payload value="#[&quot;The payload from serviceMethodAFlow = \&quot;&quot; + payload + &quot;\&quot;&quot;]" doc:name="Set Payload"/>
+    </flow>
+    
+</mule>
