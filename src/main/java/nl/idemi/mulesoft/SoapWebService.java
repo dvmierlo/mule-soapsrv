@@ -1,14 +1,15 @@
 package nl.idemi.mulesoft;
 
 import javax.jws.WebService;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Callable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.Flow;
 import org.mule.session.DefaultMuleSession;
@@ -16,12 +17,13 @@ import org.mule.session.DefaultMuleSession;
 @WebService
 public class SoapWebService implements ISoapWebService, MuleContextAware
 {	
-	 MuleContext muleContext;
-	 
-	 public void setMuleContext(MuleContext context)
-	 {
+	MuleContext muleContext;
+ 
+	/* MuleContextAware */
+	public void setMuleContext(MuleContext context)
+	{
 		 muleContext = context;
-	 }
+	}
 	 
 	public String serviceMethodA(String requestMessage)
 	{
@@ -55,17 +57,16 @@ public class SoapWebService implements ISoapWebService, MuleContextAware
 			sb.append("\"");
 		}
 		sb.append(".");
-
+		
 		return sb.toString();
 		*/
-	}
-	
+	 }
 
 	 @SuppressWarnings("deprecation")
 	 public static MuleEvent invokeMuleFlow(MuleMessage muleMessage, MuleContext muleContext, String flowName) throws Exception
 	 {
 		 log("invokeMuleFlow - 0 - Executing flow \"" + flowName + "\"");
-
+		
 		 log("invokeMuleFlow - 1 - subFlow");
 		 MessageProcessor subFlow = muleContext.getRegistry().lookupObject(flowName);
 		 if (subFlow != null) // The flow is a sub-flow.
@@ -73,7 +74,7 @@ public class SoapWebService implements ISoapWebService, MuleContextAware
 			 log("invokeMuleFlow - 2 - subFlow muleEvent");
 			 MuleEvent muleEvent = new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, new DefaultMuleSession());
 			 log("invokeMuleFlow - 3 - subFlow muleEvent process");
-			 return subFlow.process(muleEvent);			 
+				 return subFlow.process(muleEvent);			 
 			 
 		 }
 		 else // The flow is a flow.
@@ -83,7 +84,7 @@ public class SoapWebService implements ISoapWebService, MuleContextAware
 			 log("invokeMuleFlow - 5 - flow muleEvent");
 			 MuleEvent muleEvent = new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, flow);
 			 log("invokeMuleFlow - 6 - flow muleEvent process");
-			 return flow.process(muleEvent);			 
+				 return flow.process(muleEvent);			 
 		 }
 	 }
 	 
